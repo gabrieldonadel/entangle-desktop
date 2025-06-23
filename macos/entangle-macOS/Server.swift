@@ -271,12 +271,24 @@ struct ContentView: View {
 
             // --- Accessibility Permissions ---
             VStack(alignment: .leading, spacing: 10) {
-                Text("Permissions").font(.headline)
+                HStack {
+                    Text("Permissions").font(.headline)
+                    Spacer()
+                    Button {
+                        server.checkPermissions()
+                    } label: {
+                        Image(systemName: "arrow.clockwise")
+                        Text("Refresh")
+                    }
+                    .buttonStyle(.plain) // Use plain style for a less prominent button
+                    .foregroundColor(.accentColor)
+                }
+
                 HStack {
                     Image(systemName: server.hasAccessibilityPermissions ? "lock.open.fill" : "lock.fill")
                         .foregroundColor(server.hasAccessibilityPermissions ? .green : .red)
                     Text("Accessibility Access:")
-                    Text(server.hasAccessibilityPermissions ? "Granted" : "Required")
+                    Text(server.hasAccessibilityPermissions ? "Granted" : "Denied")
                         .fontWeight(.bold)
                         .foregroundColor(server.hasAccessibilityPermissions ? .green : .red)
                 }
@@ -285,9 +297,15 @@ struct ContentView: View {
                     Text("This app needs permission to control the cursor. Please grant access in System Settings.")
                         .font(.caption)
                         .foregroundColor(.secondary)
+
                     Button("Open Privacy & Security Settings") {
                         InputEventManager.openAccessibilitySettings()
                     }
+
+                    Text("Tip: If you've already granted permission, try removing the app from the list in System Settings, adding it back, and then clicking the 'Refresh' button above.")
+                        .font(.caption2)
+                        .foregroundColor(.secondary)
+                        .padding(.top, 5)
                 }
             }
             .padding()
@@ -319,7 +337,7 @@ struct ContentView: View {
         .padding()
         .frame(minWidth: 400, minHeight: 400)
         .onAppear {
-            // Re-check permissions when the view appears
+            // Re-check permissions when the view appears or app becomes active
              NotificationCenter.default.addObserver(forName: NSApplication.didBecomeActiveNotification, object: nil, queue: .main) { _ in
                 server.checkPermissions()
             }
