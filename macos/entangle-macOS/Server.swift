@@ -54,7 +54,7 @@ class InputEventManager {
         case .move:
             // Convert normalized coordinates (0.0-1.0) to screen coordinates.
             let targetX = screenFrame.origin.x + (event.point.x * screenFrame.width)
-            let targetY = screenFrame.origin.y + ((1.0 - event.point.y) * screenFrame.height) // Y is inverted in Core Graphics
+            let targetY = screenFrame.origin.y + (event.point.y * screenFrame.height)
             let targetPoint = CGPoint(x: targetX, y: targetY)
             postMoveEvent(to: targetPoint)
 
@@ -182,7 +182,7 @@ class TrackpadServer: ObservableObject {
         // Explicitly dispatch to the main queue to satisfy MainActor isolation.
         DispatchQueue.main.async {
           guard let self = self else { return }
-          
+
           switch state {
           case .ready:
             print("Connection ready")
